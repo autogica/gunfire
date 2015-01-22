@@ -228,16 +228,16 @@ updateAssets = (files=[]) ->
 
           mod.data.name = "#{meta.name ? dirName}".trim().toLowerCase()
 
-          assetConfigForProject = config.assets[meta.name] ? {}
+          #assetConfigForProject = config.assets[meta.name] ? {}
 
           mod.data.version = meta.version ? '0.0.0'
 
-          mod.data.enabled = assetConfigForProject.enabled ? false
+          mod.data.enabled = true
 
-          # basic version filtering for now
-          if assetConfigForProject.version isnt '*'
-            if assetConfigForProject.version isnt mod.data.version
-              mod.data.enabled = false
+          ## basic version filtering for now
+          #if assetConfigForProject.version isnt '*'
+          #  if assetConfigForProject.version isnt mod.data.version
+          #    mod.data.enabled = false
 
 
           mod.data.genome = {}
