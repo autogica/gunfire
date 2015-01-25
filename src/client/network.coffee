@@ -57,12 +57,12 @@ class Network
         return
 
       instance.app ?= @app
-      instance.genome ?= asset.genome
+      instance.clientSettings ?= asset.clientSettings
       instance.prototype = module.exports.prototype
 
       # inject some properties
       instance.clientHash = asset.clientHash
-      instance.genomeHash = asset.genomeHash
+      instance.clientSettingsHash = asset.clientSettingsHash
 
       #instance.update
 
@@ -112,7 +112,7 @@ class Network
         instance._tween.start()
 
       # update immediately
-      instance._update.call instance, instance.genome,
+      instance._update.call instance, instance.clientSettings,
         duration: 0
         reset: yes
 
@@ -140,12 +140,12 @@ class Network
         for name, asset of data.pong
 
           # try to fdetect changes
-          genomeChanged = yes
+          clientSettingsChanged = yes
           clientChanged = yes
           assetDeleted = JSON.stringify(asset) is '{}'
           assetExists = name of @app.assets
           if assetExists
-            genomeChanged = asset.genomeHash isnt @app.assets[name].genomeHash
+            clientSettingsChanged = asset.clientSettingsHash isnt @app.assets[name].clientSettingsHash
             clientChanged = asset.clientHash isnt @app.assets[name].clientHash
 
           if assetExists and assetDeleted
@@ -153,20 +153,20 @@ class Network
             continue
 
           if clientChanged
-            console.log " - #{name}: updating client and genome.."
+            console.log " - #{name}: updating client and clientSettings.."
             updateAssetClient name, asset
 
-          else if genomeChanged and not assetExists
-            console.log " - #{name}: also updating client and genome.."
+          else if clientSettingsChanged and not assetExists
+            console.log " - #{name}: also updating client and clientSettings.."
             updateAssetClient name, asset
 
-          else if genomeChanged
-            console.log " - #{name}: updating genome only.."
-            @app.assets[name].genome = asset.genome
-            @app.assets[name].genomeHash = asset.genomeHash
+          else if clientSettingsChanged
+            console.log " - #{name}: updating clientSettings only.."
+            @app.assets[name].clientSettings = asset.clientSettings
+            @app.assets[name].clientSettingsHash = asset.clientSettingsHash
 
             # update using morphing, but no reset
-            @app.assets[name]._update.call @app.assets[name], @app.assets[name].genome,
+            @app.assets[name]._update.call @app.assets[name], @app.assets[name].clientSettings,
               duration: 0
               reset: yes
 
@@ -185,7 +185,7 @@ class Network
       #console.log JSON.stringify asset
       assets[name] =
         clientHash: asset.clientHash
-        genomeHash: asset.genomeHash
+        clientSettingsHash: asset.clientSettingsHash
     #console.log JSON.stringify assets
     @primus.write
       ping:

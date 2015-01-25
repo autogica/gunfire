@@ -93,10 +93,10 @@ importModule = (mod) ->
   oldClientHash = if existing? then existing.clientHash else ''
   newClientHash = mod.clientHash.digest('hex')
 
-  oldGenomeHash = if existing? then existing.genomeHash else ''
-  newGenomeHash = mod.genomeHash.digest('hex')
+  oldClientSettingsHash = if existing? then existing.clientSettingsHash else ''
+  newClientSettingsHash = mod.clientSettingsHash.digest('hex')
 
-  if newServerHash is oldServerHash and newClientHash is oldClientHash and newGenomeHash is oldGenomeHash
+  if newServerHash is oldServerHash and newClientHash is oldClientHash and newClientSettingsHash is oldClientSettingsHash
     #console.log " - #{mod.data.name}: unchanged"
     return
 
@@ -104,12 +104,12 @@ importModule = (mod) ->
     name: mod.data.name
     client: mod.data.client
     version: mod.data.version
-    genome: mod.data.genome
+    clientSettings: mod.data.clientSettings
     controller: undefined
     error: undefined
     clientHash: newClientHash
     serverHash: newServerHash
-    genomeHash: newGenomeHash
+    clientSettingsHash: newClientSettingsHash
 
   try
     asset.controller = new mod.data.server app, asset
@@ -128,7 +128,7 @@ importModule = (mod) ->
 
   asset.controller.authorize ?= -> no
 
-  asset.controller.getGenome ?= -> asset.genome
+  asset.controller.getClientSettings ?= -> asset.clientSettings
 
   asset.controller.getClient ?= -> asset.client
 
@@ -144,7 +144,7 @@ importModule = (mod) ->
     delete existing.controller['app']
     delete existing.controller['asset']
     delete existing['name']
-    delete existing['genome']
+    delete existing['clientSettings']
     delete existing['version']
     delete existing['controller']
     delete app.assets[asset.name]
@@ -154,7 +154,7 @@ importModule = (mod) ->
 
   # clear the temporary init stuff
   #delete mod.data['client']
-  #delete mod.data['genome']
+  #delete mod.data['clientSettings']
   #delete mod.data['server']
   #delete mod.data['version']
   #delete mod['data']
@@ -188,7 +188,7 @@ updateAssets = (files=[]) ->
         data: {}
         clientHash: crypto.createHash('sha256')
         serverHash: crypto.createHash('sha256')
-        genomeHash: crypto.createHash('sha256')
+        clientSettingsHash: crypto.createHash('sha256')
 
     mod = modules[dirName]
 
@@ -240,10 +240,10 @@ updateAssets = (files=[]) ->
           #    mod.data.enabled = false
 
 
-          mod.data.genome = {}
+          mod.data.clientSettings = {}
           if meta.gunfire?
             if meta.gunfire.config?
-              mod.data.genome = meta.gunfire.config
+              mod.data.clientSettings = meta.gunfire.config
 
         catch err
           mod.error = 'bad meta: ' + err
@@ -415,7 +415,7 @@ primus.on "connection", (spark) ->
         # do not send assets already synchronized
         if client.assets[name]?
           if client.assets[name].clientHash is serverAsset.clientHash
-            if client.assets[name].genomeHash is serverAsset.genomeHash
+            if client.assets[name].clientSettingsHash is serverAsset.clientSettingsHash
               continue
 
         console.log " -> sending #{name}"
@@ -424,9 +424,9 @@ primus.on "connection", (spark) ->
           name: name
           version: serverAsset.version
           clientHash: serverAsset.clientHash
-          genomeHash: serverAsset.genomeHash
+          clientSettingsHash: serverAsset.clientSettingsHash
           source: serverAsset.controller.getClient()
-          genome: serverAsset.controller.getGenome()
+          clientSettings: serverAsset.controller.getClientSettings()
 
         clientAssets[serverAsset.name] = clientAsset
 
