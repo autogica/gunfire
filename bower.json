@@ -34,7 +34,8 @@
     "tweenjs": "*",
     "primus": "2.4.12",
     "stats.js": "mrdoob/stats.js",
-    "threejs": "*"
+    "threejs": "*",
+    "howler.js": "~1.1.25"
   },
   "resolutions": {
     "polymer": ">=0.4.0 <1.0.0",

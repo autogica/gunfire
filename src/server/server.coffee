@@ -100,6 +100,8 @@ importModule = (mod) ->
     #console.log " - #{mod.data.name}: unchanged"
     return
 
+  #console.log "mod.data: #{utils.pretty mod.data}"
+
   asset =
     name: mod.data.name
     client: mod.data.client
@@ -111,10 +113,12 @@ importModule = (mod) ->
     serverHash: newServerHash
     clientSettingsHash: newClientSettingsHash
 
+  #console.log "asset: #{utils.pretty asset}"
+
   try
     asset.controller = new mod.data.server app, asset
   catch err
-    console.log " - #{asset.name}: #{err}"
+    console.log " - #{asset.name}:\n #{err}"
     asset.error = err
     return
 
@@ -200,9 +204,10 @@ updateAssets = (files=[]) ->
           if mod.data.client? and mod.data.client isnt ''
             mod.clientHash.update mod.data.client
           else
-            mod.error = 'bad client'
+            mod.error = 'invalid client.coffee:\n '.red
         catch err
-          mod.error = 'bad client: ' + err
+
+          mod.error = 'invalid client.coffee:\n '.red + err
         mod.progress += 25
 
       when 'server.coffee'
@@ -214,8 +219,8 @@ updateAssets = (files=[]) ->
           else
             mod.error = 'bad server'
         catch err
-          console.log "server.coffee error"
-          mod.error = 'bad server: ' + err
+          #console.log 'invalid server.coffee:\n '.red + err
+          mod.error = 'invalid server.coffee:\n '.red + err
         mod.progress += 25
 
       when 'package.json' # for migration
@@ -242,11 +247,11 @@ updateAssets = (files=[]) ->
 
           mod.data.clientSettings = {}
           if meta.gunfire?
-            if meta.gunfire.config?
-              mod.data.clientSettings = meta.gunfire.config
+            if meta.gunfire.clientSettings?
+              mod.data.clientSettings = meta.gunfire.clientSettings
 
         catch err
-          mod.error = 'bad meta: ' + err
+          mod.error = 'invalid package.json: '.red + err
         mod.progress += 25
 
         mod.progress += 25
@@ -257,7 +262,7 @@ updateAssets = (files=[]) ->
 setInterval updateAssets, 250
 
 syncAsset = (f, del) ->
-  console.log "assets has been modified"
+  console.log "gunfire: some files in the assets dir have been modified".grey
   app.updateNeeded = yes
 
 # or use https://github.com/carlos8f/saw
@@ -278,7 +283,7 @@ watch.createMonitor config.assetsDir,
   monitor.on "removed", (f, stat) ->
 
     # Handle removed files
-    console.log "asset removed: " + f
+    console.log "gunfire: asset removed: ".grey + f
     #syncAsset f, yes
     return
 
@@ -372,7 +377,7 @@ primus.use('multiplex', PrimusMultiplex)
 # Listen for new connections and send data
 #
 primus.on "connection", (spark) ->
-  console.log "new connection"
+  console.log "gunfire: new connection".grey
   spark.on "data", (packet) ->
     #console.log "incoming:", packet
 
@@ -418,7 +423,7 @@ primus.on "connection", (spark) ->
             if client.assets[name].clientSettingsHash is serverAsset.clientSettingsHash
               continue
 
-        console.log " -> sending #{name}"
+        console.log "gunfire: sending #{name}"
 
         clientAsset =
           name: name
@@ -445,7 +450,7 @@ primus.on "connection", (spark) ->
 # primus.save "primus.js"
 
 # setTimeout((-> open 'http://localhost:8080'), 1000)
-console.log "listening to #{config.serverPort}"
+console.log "gunfire: now listening to #{config.serverPort}"
 server.listen config.serverPort
 ###
 bowerModules = []

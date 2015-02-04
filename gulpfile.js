@@ -57,6 +57,8 @@ gulp.task('build-dependencies', function(){
       'lib/client/controls/HoverControls.js',
       'lib/client/controls/SatControls.js',
 
+      // for now all the music comes from Soundcloud streaming servers
+      'lib/client/audio/soundcloud.js',
 
       'bower_components/Oimo.js/build/Oimo.min.js',
       'bower_components/threex.oimo/threex.oimo.js',
@@ -67,8 +69,8 @@ gulp.task('build-dependencies', function(){
       'bower_components/ect/lib/ect.js',
       'bower_components/Keypress/Keypress.js',
       'bower_components/wagner/Wagner.js',
-      'bower_components/odometer/odometer.js'
-
+      'bower_components/odometer/odometer.js',
+      'bower_comopnents/howler.js/howler.min.js'
 
      ])
       .pipe(concat('vendor.js'))

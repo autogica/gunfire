@@ -56,6 +56,7 @@ class Network
         console.log err.stack
         return
 
+      #console.log " - #{name}: asset:", asset
       instance.app ?= @app
       instance.clientSettings ?= asset.clientSettings
       instance.prototype = module.exports.prototype
@@ -112,6 +113,7 @@ class Network
         instance._tween.start()
 
       # update immediately
+      console.log " - #{name}: calling update on", instance
       instance._update.call instance, instance.clientSettings,
         duration: 0
         reset: yes

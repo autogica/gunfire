@@ -1,6 +1,6 @@
 {
   "name": "gunfire",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "asset server for autogica",
   "main": "./lib/server/server.js",
   "bin": "./bin/gunfire",
