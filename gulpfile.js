@@ -70,7 +70,7 @@ gulp.task('build-dependencies', function(){
       'bower_components/Keypress/Keypress.js',
       'bower_components/wagner/Wagner.js',
       'bower_components/odometer/odometer.js',
-      'bower_comopnents/howler.js/howler.min.js'
+      'bower_components/howler.js/howler.min.js'
 
      ])
       .pipe(concat('vendor.js'))
