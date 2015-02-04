@@ -79,7 +79,7 @@ class App
     # see http://threejs.org/examples/webgl_octree_raycasting.html
     @octree = new THREE.Octree
       # uncomment below to see the octree (may kill the fps)
-      scene: @scene
+      #scene: @scene
 
       # when undeferred = yes, objects are inserted immediately
       # instead of being deferred until next octree.update() call
