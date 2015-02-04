@@ -184,7 +184,7 @@ class Network
     # this is not a very strict enforcing
     assets = {}
     for name, asset of @app.assets
-      #console.log JSON.stringify asset
+      #console.log "asset: " + name
       assets[name] =
         clientHash: asset.clientHash
         clientSettingsHash: asset.clientSettingsHash

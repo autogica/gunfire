@@ -18,7 +18,9 @@ class App
         #precision: 'mediump' # for low-end mobiles
 
       network:
-        interval: 2000
+        interval: 800 # how frequently we should try to sync content with
+                      # the server. Should be a few seconds. Also the server
+                      # should enforce some quotas for cheaters or DoS attackers
 
     @gunfire =
       resourcesPath: window.location.origin + '/gunfire'
@@ -33,9 +35,16 @@ class App
     @windowHalfX = window.innerWidth / 2
     @windowHalfY = window.innerHeight / 2
 
+    # network pipeline
     @network = new Network @
 
+    # audio pipeline
     @audio = new Audio @
+
+    # internal message queue
+    @events = []
+    @listeners = []
+
 
     @parent = document.body
     @container = document.createElement('div')
@@ -70,7 +79,7 @@ class App
     # see http://threejs.org/examples/webgl_octree_raycasting.html
     @octree = new THREE.Octree
       # uncomment below to see the octree (may kill the fps)
-      #scene: @scene
+      scene: @scene
 
       # when undeferred = yes, objects are inserted immediately
       # instead of being deferred until next octree.update() call
@@ -87,7 +96,7 @@ class App
       # helps insert objects that lie over more than one node
       overlapPct: 0.15
 
-    axisHelper = new THREE.AxisHelper( 40 )
+    axisHelper = new THREE.AxisHelper( 80 )
     @scene.add axisHelper
 
     @stats = new Stats()
@@ -112,6 +121,40 @@ class App
 
     @renderer.setSize window.innerWidth, window.innerHeight
     @controls.handleResize()
+
+
+  emit: (emitter, message, data) ->
+    i = 0
+    listener = undefined
+    isUnused = true
+    for listener in listeners
+      result = listener emitter, message, data
+      if result
+        isUnused = false
+
+    console.log "emit", emitter, message, data
+
+    if isUnused
+      #events.push([emitter, message, data]);
+      0
+
+    if events.length
+      nextUnusedEvent = events.shift()
+      after 1000, =>
+        @emit nextUnusedEvent[0], nextUnusedEvent[1], nextUnusedEvent[2]
+
+
+  listen: (handler) ->
+    @listeners.push handler
+
+
+  subscribe: (emitter, message, callback) ->
+    listeners.push (_emitter, _message, _p1, _p2, _p3, _p4, _p5, _p6) ->
+      if emitter isnt _emitter or message isnt _message
+        return no
+      return callback _p1, _p2, _p3, _p4, _p4, _p5, _p6
+
+
 
   animate: =>
     requestAnimationFrame @animate
@@ -142,7 +185,7 @@ class App
 
 
   #
-  # Every 2 seconds, we ask the server to see if we need to update our objects
+  # Every N seconds, we ask the server to see if we need to update our objects
   # objects are json stuff, with code (serialied functions) inside
   #  Objects can be anything: ground, robots..
   # TODO: if there is an exception, we should wait a bit more before trying again
