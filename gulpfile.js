@@ -30,15 +30,19 @@ gulp.task('build-dependencies', function(){
       'bower_components/coffee-script/extras/coffee-script.js',
       'bower_components/threejs/build/three.min.js',
 
+      'lib/client/threejs/PRNG.js',
       'lib/client/threejs/ImprovedNoise.js',
       'lib/client/threejs/Detector.js',
       'lib/client/threejs/Octree.js',
       'lib/client/threejs/TypedArrayUtils.js',
       'lib/client/threejs/Projector.js',
+      'lib/client/threejs/SceneUtils.js',
+      'lib/client/threejs/ParametricGeometries.js',
 
     // marching cubes tables and CSG library
       'lib/client/marching/MarchingCubesData.js',
       'lib/client/csg/ThreeCSG.js',
+
 
       // shaders (mirror must be loaded before water)
       'lib/client/shaders/Mirror.js',
@@ -67,7 +71,7 @@ gulp.task('build-dependencies', function(){
       'bower_components/operative/dist/operative.js',
       //'bower_components/dat-gui/build/dat.gui.js',
       'bower_components/ect/lib/ect.js',
-      'bower_components/Keypress/Keypress.js',
+      'bower_components/Keypress/keypress-2.1.0.min.js',
       'bower_components/wagner/Wagner.js',
       'bower_components/odometer/odometer.js',
       'bower_components/howler.js/howler.min.js'
