@@ -228,7 +228,7 @@ class window.ObjectPoolFactory
     console.log "ObjectPoolFactory: free: asked to free object"
 
     # remove the object
-    index = indexOf obj
+    index = @objects.indexOf obj
     @objects.splice index, 1
 
     @objectDestroyer obj
