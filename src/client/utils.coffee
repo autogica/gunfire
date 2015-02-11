@@ -204,7 +204,7 @@ class window.ObjectPoolFactory
 
     console.log "ObjectPoolFactory: get: creating a fresh instance object.."
     @objectFactory obj, opts
-    obj.visible = yes
+    obj.mesh.visible = yes
 
     console.log "ObjectPoolFactory: get: unshifting.."
     @objects.unshift obj
@@ -242,7 +242,7 @@ class window.ObjectPoolFactory
 
     # actual recycling
     obj.mesh.visible = no
-    obj.mesh.isFree = yes
+    obj.isFree = yes
 
     #note: there might still be some garbage attached to the object, such as
     # private properties, but that's okay, because they are common to all
