@@ -71,10 +71,13 @@ gulp.task('build-dependencies', function(){
       'bower_components/operative/dist/operative.js',
       //'bower_components/dat-gui/build/dat.gui.js',
       'bower_components/ect/lib/ect.js',
-      'bower_components/Keypress/keypress-2.1.0.min.js',
+      //'bower_components/Keypress/keypress-2.1.0.min.js',
       'bower_components/wagner/Wagner.js',
       'bower_components/odometer/odometer.js',
-      'bower_components/howler.js/howler.min.js'
+      'bower_components/howler.js/howler.min.js',
+
+      // mousetrap is managed by npm
+      'bower_components/mousetrap/mousetrap.min.js'
 
      ])
       .pipe(concat('vendor.js'))

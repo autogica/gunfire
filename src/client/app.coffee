@@ -3,6 +3,7 @@ Network = require './network'
 utils = require './utils'
 TWEEN = require 'tween.js'
 Stats = require 'stats.js'
+Mousetrap = require 'mousetrap'
 
 class App
 
@@ -44,6 +45,50 @@ class App
     # internal message queue
     @events = []
     @listeners = []
+
+    @debug = on
+
+    @market = new Market()
+
+    @market
+
+      .lookToSell
+        product: "bar"
+        callback: (issue, sendSalesQuote) ->
+          console.log "dealer: somebody asked for stuff, options:", issue
+
+          sendSalesQuote {price: 2000}, (sendGoods) ->
+
+            # build some good matching the order
+            goods = [
+              foo: "bar"
+            ]
+
+            review = (score) ->
+              console.log "dealer: buyer gave us a review:", score
+
+            refund = (onComplete) ->
+              console.log "dealer: ok to refund, be we are going to recover good's ownership, ie. either redirect it or destroy it"
+              for good in goods
+                good.destroy?()
+
+              console.log "dealer: give some money back"
+              amountRestored = 1
+              onComplete amountRestored
+
+            console.log "dealer: buyer accepted our stuff, sending goods.."
+            sendGoods goods, review, refund
+
+      .lookToBuy
+        product: "foo"
+        options: style: "great"
+        timeout: 3600000
+        callback: (salesQuote, acceptQuote, stopSearch) ->
+          console.log "buyer: got a salesQuote:", salesQuote
+          console.log "buyer: accepting quote"
+          # TODO check offer
+          acceptQuote (goods, review, refund) -> # buy
+            console.log "buyer: received #{goods.length} goods:", goods
 
 
     @parent = document.body
@@ -103,6 +148,7 @@ class App
     @stats = new Stats()
     @stats.domElement.style.position = 'absolute'
     @stats.domElement.style.top = '0px'
+    @stats.domElement.style.right = '0px'
     @stats.domElement.style.zIndex = 100
     @container.appendChild @stats.domElement
 

@@ -1,6 +1,6 @@
 {
   "name": "gunfire",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "asset server for autogica",
   "main": "./lib/server/server.js",
   "bin": "./bin/gunfire",
@@ -29,6 +29,9 @@
     },
     "primus": {
       "exports": "global:Primus"
+    },
+    "mousetrap": {
+      "exports": "global:Mousetrap"
     }
   },
   "dependencies": {
@@ -80,6 +83,7 @@
     "vinyl-source-stream": "^1.0.0",
     "watch": "^0.11.0",
     "watchify": "^1.0.6",
-    "ws": "^0.4.32"
+    "ws": "^0.4.32",
+    "mousetrap": "1.4.6"
   }
 }

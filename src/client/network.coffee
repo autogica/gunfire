@@ -85,7 +85,7 @@ class Network
         # initial setup
         unless instance.conf?
           instance.conf = conf
-          instance.update? opts.reset
+          instance.update? opts.reset, conf
           return
 
         if instance._tween? and instance._tween.stop?
