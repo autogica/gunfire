@@ -38,6 +38,7 @@ gulp.task('build-dependencies', function(){
       'lib/client/threejs/Projector.js',
       'lib/client/threejs/SceneUtils.js',
       'lib/client/threejs/ParametricGeometries.js',
+      'lib/client/threejs/ConvexGeometry.js',
 
     // marching cubes tables and CSG library
       'lib/client/marching/MarchingCubesData.js',

@@ -110,6 +110,9 @@ class App
 
     @renderer.sortObjects = yes
 
+    # what do these do?
+    #@renderer.shadowMapEnabled = yes
+    #@renderer.shadowMapCullFace = THREE.CullFaceBack
 
     # renderer.setClearColor( 0xafaadf, 1 )
     @renderer.setSize window.innerWidth, window.innerHeight
