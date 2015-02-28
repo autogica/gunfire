@@ -14,6 +14,8 @@ var browserify = require('gulp-browserify');
 var uglify = require('gulp-uglify');
 var coffee = require('gulp-coffee');
 var concatsourcemap = require('gulp-concat-sourcemap');
+var sourcemaps = require("gulp-sourcemaps");
+var babel = require("gulp-babel");
 
 gulp.task('build-server', function() {
   gulp.src('src/server/*.coffee')
@@ -95,6 +97,13 @@ gulp.task('build-client', function() {
     }))
     .pipe(rename('gunfire.js'))
     .pipe(gulp.dest('lib/client'))
+
+  return gulp.src("src/client/*.js")
+    .pipe(sourcemaps.init())
+    .pipe(concat("all.js"))
+    .pipe(babel())
+    .pipe(sourcemaps.write("."))
+    .pipe(gulp.dest("lib/client"));
 });
 
 // TODO maybe we could concatenate everything:
