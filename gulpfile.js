@@ -27,6 +27,7 @@ gulp.task('build-dependencies', function(){
       'lib/client/primus.js',
       // otherwise we would need to include all plugins ourselves
       //'bower_components/primus/primus.js'
+      "bower_components/rxjs/dist/rx.all.min.js",
       'bower_components/coffee-script/extras/coffee-script.js',
       'bower_components/threejs/build/three.min.js',
 
