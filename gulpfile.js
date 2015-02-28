@@ -98,6 +98,10 @@ gulp.task('build-client', function() {
     .pipe(rename('gunfire.js'))
     .pipe(gulp.dest('lib/client'))
 
+  // TODO: maybe use babelify instead of the manual build:
+  // https://github.com/babel/babelify
+  // because it also contains a babelify polyfill
+  // require("babelify/polyfill");
   return gulp.src("src/client/*.js")
     .pipe(sourcemaps.init())
     .pipe(concat("all.js"))
