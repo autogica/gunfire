@@ -24,6 +24,8 @@ gulp.task('build-server', function() {
 });
 
 gulp.task('build-dependencies', function(){
+
+  // source maps
   gulp.src([
     "bower_components/rxjs/dist/rx.all.map"
   ]).pipe(gulp.dest('lib/client'));
@@ -71,6 +73,9 @@ gulp.task('build-dependencies', function(){
 
       // for now all the music comes from Soundcloud streaming servers
       'lib/client/audio/soundcloud.js',
+
+      // for metrics
+      'lib/client/metrics/influxdb-latest.js',
 
       'bower_components/Oimo.js/build/Oimo.min.js',
       'bower_components/threex.oimo/threex.oimo.js',
