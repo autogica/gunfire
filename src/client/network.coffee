@@ -12,26 +12,26 @@ class Network
     @primus = new Primus()
 
     @primus.on 'reconnect', (opts) ->
-      console.log('Reconnecting:', 'We are scheduling a new reconnect attempt in '+opts.timeout+' ms.')
+      console.log('Reconnecting:', 'gunfire: we are scheduling a new reconnect attempt in '+opts.timeout+' ms.')
 
 
     @primus.on 'reconnect', ->
-      console.log('Reconnect:', 'Starting the reconnect attempt, hopefully we get a connection!')
+      console.log('Reconnect:', 'gunfire: starting the reconnect attempt, hopefully we get a connection!')
 
 
     @primus.on 'online', ->
-      console.log('Online:', 'We have regained control over our internet connection.')
+      console.log('Online:', 'gunfire: we have regained control over our internet connection.')
 
 
     @primus.on 'offline', ->
-      console.log('Offline:', 'We lost our internet connection.')
+      console.log('Offline:', 'gunfire: we lost our internet connection.')
 
 
     @primus.on 'open', =>
-      console.log('Open:', 'The connection has been established.')
+      console.log('Open:', 'gunfire: the connection has been established.')
 
     @primus.on 'error', (err) =>
-      console.log('Error:', 'An unknown error has occured: '+err.message+'')
+      console.log('Error:', 'gunfire: an unknown error has occured: '+err.message+'')
 
 
     updateAssetClient = (name, asset) =>
@@ -44,7 +44,7 @@ class Network
       #  return
 
       unless module.exports?
-        console.log " - #{name}: source error"
+        console.log "gunfire: #{name}: source error"
         return
 
       instance = {}
@@ -52,8 +52,7 @@ class Network
       try
         instance = new module.exports @app.assets[name]
       catch err
-        console.log " - #{name}: update error: #{err}"
-        console.log err.stack
+        console.log "gunfire: #{name}: update error:", err
         return
 
       #console.log " - #{name}: asset:", asset
@@ -113,25 +112,43 @@ class Network
         instance._tween.start()
 
       # update immediately
-      console.log " - #{name}: calling update on", instance
+      console.log "gunfire: #{name}: calling update on", instance
       instance._update.call instance, instance.clientSettings,
         duration: 0
         reset: yes
 
       # try to free existing instance
       if name of @app.assets
-        console.log " - #{name}: found previous instance"
+        console.log "gunfire: #{name}: found previous instance"
         if @app.assets[name].free?
-          console.log " - #{name}: unloading previous instance.."
+          console.log "gunfire: #{name}: unloading previous instance.."
           try
             @app.assets[name].free()
             delete @app.assets[name]
+            try
+              namePath = name.split '-'
+              tmp = window
+              for item in namePath
+                tmp = window[item]
+              tmp = instance
+            catch err2
+              console.log "gunfire: couldn't create shortcut for #{name.replace(/-/g, '.')}", err2
           catch err
-            console.log " - #{name}: cannot overwrite existing instance: #{err}"
+            console.log "gunfire: #{name}: cannot overwrite existing instance:", err
+
 
       @app.assets[name] = instance
 
-      console.log " - #{name}: updated"
+      console.log "gunfire: #{name}: updated"
+      # TODO: create a shortcut
+      try
+        namePath = name.split '-'
+        tmp = window
+        for item in namePath
+          tmp = window[item]
+        tmp = instance
+      catch err
+        console.log "gunfire: couldn't create shortcut for #{name.replace(/-/g, '.')}:", err
 
 
     @primus.on 'data', (data) =>
@@ -155,15 +172,15 @@ class Network
             continue
 
           if clientChanged
-            console.log " - #{name}: updating client and clientSettings.."
+            console.log "gunfire: #{name}: updating client and clientSettings.."
             updateAssetClient name, asset
 
           else if clientSettingsChanged and not assetExists
-            console.log " - #{name}: also updating client and clientSettings.."
+            console.log "gunfire: #{name}: also updating client and clientSettings.."
             updateAssetClient name, asset
 
           else if clientSettingsChanged
-            console.log " - #{name}: updating clientSettings only.."
+            console.log "gunfire: #{name}: updating clientSettings only.."
             @app.assets[name].clientSettings = asset.clientSettings
             @app.assets[name].clientSettingsHash = asset.clientSettingsHash
 
@@ -173,11 +190,11 @@ class Network
               reset: yes
 
     @primus.on 'end', ->
-      console.log('End:', 'The connection has ended.')
+      console.log('End:', 'gunfire: the connection has ended.')
 
 
     @primus.on 'close', ->
-      console.log('Close:', 'We\'ve lost the connection to the server.')
+      console.log('Close:', 'gunfire: we\'ve lost the connection to the server.')
 
   sync: =>
     # server will verify that ware roughtly at the right place

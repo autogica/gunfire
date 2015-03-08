@@ -50,6 +50,7 @@ class App
 
     @market = new Market()
 
+    # TODO remove this, this was for testing only
     @market
 
       .lookToSell
@@ -120,7 +121,7 @@ class App
     @container.appendChild @renderer.domElement
 
     @controls = new THREE.GodControls @
-    @controls.movementSpeed = 800
+    @controls.movementSpeed = 100
     @controls.lookSpeed     = 0.2
 
     @projector = new THREE.Projector()

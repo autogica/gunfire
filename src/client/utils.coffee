@@ -38,6 +38,24 @@ exports.unflatten = (obj) ->
   res
 
 
+# Returns a function, that, as long as it continues to be invoked, will not
+# be triggered. The function will be called after it stops being called for
+# N milliseconds. If `immediate` is passed, trigger the function on the
+# leading edge, instead of the trailing.
+window.debounce = (func, wait, immediate) ->
+  timeout = null
+  ->
+    args = arguments
+    later = =>
+      timeout = null
+      unless immediate
+        func.apply @, args
+    callNow = immediate and not timeout
+    clearTimeout timeout
+    timeout = setTimeout later, wait
+    if callNow
+      func.apply @, args
+
 
 class window.ObjectPoolFactory
   constructor: ->

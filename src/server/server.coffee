@@ -49,6 +49,8 @@ app =
   assets: {}
   clients: {}
   updateNeeded: yes
+  fileIndex: {}
+
 
 config = {}
 try
@@ -173,8 +175,7 @@ updateAssets = (files=[]) ->
   app.updateNeeded = no
 
   unless files.length
-    files = simplewalk.match(config.assetsDir, /(\.json)|(\.coffee)$/gi) or []
-    #console.log files
+    files = simplewalk.match(config.assetsDir, /(\.(?:json|js|es6|coffee|ts))$/gi) or []
 
   modules = {}
   console.log "reparsing all assets"
@@ -182,6 +183,10 @@ updateAssets = (files=[]) ->
 
     unless fullPath[0] is '/'
       fullPath = "./#{fullPath}"
+
+    console.log " fullPath: #{fullPath}"
+
+    console.log "split: #{fullPath.split[config.assetsDir]}"
 
     [head..., dirName, fileName] = fullPath.split '/'
 
@@ -330,9 +335,13 @@ server = http.createServer (req, res) ->
     # content-type checking
     if url.endsWith(".jpg")
       contentType = "image/jpeg"
-
-    if url.endsWith(".png")
+    else if url.endsWith(".png")
       contentType = "image/png"
+    resource = config.publicDir + url
+
+  else if /^\/maps\//.test(url)
+    if url.endsWith(".json")
+      contentType = "aplication/json"
     resource = config.publicDir + url
 
   else
