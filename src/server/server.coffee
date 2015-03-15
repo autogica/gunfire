@@ -19,6 +19,9 @@ PrimusMultiplex  = require('primus-multiplex')
 PrimusRedis      = require('primus-redis')
 PrimusRedisRooms = require('primus-redis-rooms')
 
+# live build system
+babelCore = require('babel-core');
+
 # database
 redis = require('redis')
 
@@ -202,6 +205,34 @@ updateAssets = (files=[]) ->
     mod = modules[dirName]
 
     switch fileName
+
+      when 'client.es6'
+        console.log " - found client for #{dirName}"
+        try
+          clientCodeES6 = fs.readFileSync(fullPath, 'utf8')
+          if clientCodeES6? and clientCodeES6 isnt ''
+            clientCodeES5 = babelCore.transform clientCodeES6,
+              # http://babeljs.io/docs/usage/options/
+              filename: fullPath
+              sourceMap: no # "inline"
+              sourceMapName: fullPath
+              sourceFileName: fullPath
+              #resolveModuleSource: null
+              playground: false # enable things such as ["foo", "bar"].map(#toUpperCase);
+              experimental: true
+              #compact: "auto"
+              #ignore: //
+            console.log clientCodeES5.code
+            mod.data.client = clientCodeES5.code ? clientCodeES5
+            mod.data.clientSourceMap = clientCodeES5.map ? []
+            mod.clientHash.update mod.data.client
+          else
+            mod.error = 'invalid client.es6:\n '.red
+        catch err
+
+          mod.error = 'invalid client.es6:\n '.red + err
+        mod.progress += 25
+
       when 'client.coffee'
         #console.log " - found client for #{className}"
         try
@@ -216,7 +247,7 @@ updateAssets = (files=[]) ->
         mod.progress += 25
 
       when 'server.coffee'
-        #console.log " - found server for #{className}"
+        console.log " - found server for #{dirName}"
         try
           mod.data.server = uncachedRequire fullPath.replace('.coffee','')
           if mod.data.server?
@@ -226,6 +257,41 @@ updateAssets = (files=[]) ->
         catch err
           #console.log 'invalid server.coffee:\n '.red + err
           mod.error = 'invalid server.coffee:\n '.red + err
+        mod.progress += 25
+
+      when 'server.es6'
+        #console.log " - found server for #{className}"
+        try
+          serverCodeES6 = fs.readFileSync(fullPath, 'utf8')
+          #≈ = uncachedRequire fullPath #.replace('.es6','')
+
+          if serverCodeES6? and serverCodeES6 isnt ''
+            serverCodeES5 = babelCore.transform serverCodeES6,
+              # http://babeljs.io/docs/usage/options/
+              filename: fullPath
+              sourceMap: no # "inline"
+              sourceMapName: fullPath
+              sourceFileName: fullPath
+              #resolveModuleSource: null
+              playground: false # enable things such as ["foo", "bar"].map(#toUpperCase);
+              experimental: true
+              #compact: "auto"
+              #ignore: //
+
+            src = """function(Module){
+              #{serverCodeES5.code ? serverCodeES5}
+              return Server;
+            }"""
+            console.log src
+            Wrapped = eval src
+            Module = {}
+            mod.data.server = Wrapped(Module)
+            mod.data.serverSourceMap = serverCodeES5.map ? []
+          else
+            mod.error = 'bad server'
+        catch err
+          #console.log 'invalid server.es6:\n '.red + err
+          mod.error = 'invalid server.es6:\n '.red + err
         mod.progress += 25
 
       when 'package.json' # for migration
@@ -257,9 +323,8 @@ updateAssets = (files=[]) ->
 
         catch err
           mod.error = 'invalid package.json: '.red + err
-        mod.progress += 25
-
-        mod.progress += 25
+        mod.progress += 50
+        #mod.progress += 25
 
     #console.log utils.pretty mod
     importModule mod
@@ -340,6 +405,11 @@ server = http.createServer (req, res) ->
     resource = config.publicDir + url
 
   else if /^\/maps\//.test(url)
+    if url.endsWith(".json")
+      contentType = "aplication/json"
+    resource = config.publicDir + url
+
+  else if /^\/models\//.test(url)
     if url.endsWith(".json")
       contentType = "aplication/json"
     resource = config.publicDir + url

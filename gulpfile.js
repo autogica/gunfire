@@ -77,16 +77,20 @@ gulp.task('build-dependencies', function(){
       // for metrics
       'lib/client/metrics/influxdb-latest.js',
 
+      // physics engine
       'bower_components/Oimo.js/build/Oimo.min.js',
       'bower_components/threex.oimo/threex.oimo.js',
+
+      // let's give a try to cannon.js
+      'bower_components/cannonce.js/build/cannon.min.js',
+
+
       // browserified: 'bower_components/tweejs/Tween.js',
       'bower_components/stats.js/build/stats.min.js',
       'bower_components/operative/dist/operative.js',
       //'bower_components/dat-gui/build/dat.gui.js',
       'bower_components/ect/lib/ect.js',
       //'bower_components/Keypress/keypress-2.1.0.min.js',
-      'bower_components/wagner/Wagner.js',
-      'bower_components/odometer/odometer.js',
       'bower_components/howler.js/howler.min.js',
 
       // mousetrap is managed by npm

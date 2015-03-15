@@ -72,8 +72,6 @@ class window.ObjectPoolFactory
     @connected = no
     @objects = []
 
-
-
   connectTo: (scene) ->
 
     console.log "ObjectPoolFactory: addToScene"
@@ -179,14 +177,45 @@ class window.ObjectPoolFactory
       console.log "ObjectPoolFactory.compile: disposing of old geometry.."
       @geometry?.dispose?()
       console.log "ObjectPoolFactory.compile: building new geometry.."
-      @geometry = @geometryFactory @buildOptions
+      prom = @geometryFactory @buildOptions
+      prom (geometry) =>
+        @geometry = geometry
+        @afterGeometryUpdate(rebuildGeometry, rebuildMaterial, rebuildMesh)
+    else
+      @afterGeometryUpdate(rebuildGeometry, rebuildMaterial, rebuildMesh)
+    @
 
-    if rebuildMaterial
-      console.log "ObjectPoolFactory.compile: disposing of old material.."
-      @material?.dispose?()
-      @texture?.dispose?()
-      console.log "ObjectPoolFactory.compile: building new material.."
-      @material = @materialFactory @geometry, @buildOptions
+  afterMeshUpdate: (rebuildGeometry, rebuildMaterial, rebuildMesh) ->
+    # next, we extend the array with new stuff
+    if @objects.length >= @size
+      console.log "ObjectPoolFactory.compile: no need to resize"
+      @compiled = yes
+    else
+      len = @objects.length
+      console.log "ObjectPoolFactory.compile: need to resize from #{len} to #{@size}"
+      prom = @meshFactory @geometry, @material, @buildOptions
+      prom (mesh) =>
+        mesh.visible = no
+        for i in [len...@size]
+
+          if i > len
+            mesh = mesh.clone()
+
+          if @connected
+            @scene.add mesh
+
+          @objects.push
+            mesh: mesh
+            isFree: yes
+
+        @size = @objects.length
+        console.log "ObjectPoolFactory.compile: successfully resized @objects"
+        console.log "ObjectPoolFactory.compile: ended"
+        @compiled = yes
+
+
+
+  afterMaterialUpdate: (rebuildGeometry, rebuildMaterial, rebuildMesh) ->
 
     # check if we need to migrate existing content
     if @compiled and rebuildMesh
@@ -194,43 +223,26 @@ class window.ObjectPoolFactory
       len = @objects.length
       console.log "ObjectPoolFactory.compile: need to recompile #{len} objects.."
       for obj in @objects
-
         if @connected
           @scene.remove obj.mesh
-
         obj.mesh.dispose()
-
         obj.mesh = @meshFactory @geometry, @material, @buildOpts
-
         if @connected
           @scene.add obj.mesh
+    @afterMeshUpdate(rebuildGeometry, rebuildMaterial, rebuildMesh)
 
-
-    # next, we extend the array with new stuff
-    if @objects.length >= @size
-      console.log "ObjectPoolFactory.compile: no need to resize"
+  afterGeometryUpdate: (rebuildGeometry, rebuildMaterial, rebuildMesh) ->
+    if rebuildMaterial
+      console.log "ObjectPoolFactory.compile: disposing of old material.."
+      @material?.dispose?()
+      @texture?.dispose?()
+      console.log "ObjectPoolFactory.compile: building new material.."
+      prom = @materialFactory @geometry, @buildOptions
+      prom (material) =>
+        @material = material
+        @afterMaterialUpdate(rebuildGeometry, rebuildMaterial, rebuildMesh)
     else
-      len = @objects.length
-      console.log "ObjectPoolFactory.compile: need to resize from #{len} to #{@size}"
-
-      for i in [len...@size]
-        mesh = @meshFactory @geometry, @material, @buildOptions
-        mesh.visible = no
-        if @connected
-          @scene.add mesh
-
-        @objects.push
-          mesh: mesh
-          isFree: yes
-          # no tween, no params: that's normal!
-
-      @size = @objects.length
-      console.log "ObjectPoolFactory.compile: successfully resized @objects"
-
-    console.log "ObjectPoolFactory.compile: ended"
-    @compiled = yes
-
-    @
+      @afterMaterialUpdate(rebuildGeometry, rebuildMaterial, rebuildMesh)
 
 
   getSync: (opts) ->
